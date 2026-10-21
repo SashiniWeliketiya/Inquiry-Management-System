@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-
 const VALID_TRANSITIONS = {
   'New': ['In Progress'],
   'In Progress': ['Resolved', 'New'],
@@ -77,5 +76,23 @@ exports.updateStatus = async (req, res) => {
     res.json(updated.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update status' });
+  }
+};
+
+
+exports.deleteInquiry = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await db.query('DELETE FROM inquiries WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Inquiry not found' });
+    }
+
+    res.json({ message: 'Inquiry deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: 'Failed to delete inquiry' });
   }
 };

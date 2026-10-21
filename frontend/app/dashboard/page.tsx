@@ -110,6 +110,31 @@ export default function DashboardPage() {
     }
   };
 
+  // --- Delete Handler Function ---
+  const handleDeleteInquiry = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this inquiry?')) return;
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/inquiries/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to delete inquiry');
+      }
+
+      // Remove deleted inquiry from local state instantly
+      setInquiries((prev) => prev.filter((item) => item.id !== id));
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -239,7 +264,7 @@ export default function DashboardPage() {
                       </span>
 
                       {/* Quick Action Buttons */}
-                      <div className="flex gap-1 mt-2">
+                      <div className="flex flex-wrap justify-end gap-1 mt-2">
                         {item.status === 'New' && (
                           <button
                             onClick={() => handleStatusUpdate(item.id, 'In Progress')}
@@ -264,6 +289,14 @@ export default function DashboardPage() {
                             Reopen
                           </button>
                         )}
+
+                        {/* Delete Button */}
+                        <button
+                          onClick={() => handleDeleteInquiry(item.id)}
+                          className="text-xs bg-red-600 text-white px-2.5 py-1 rounded-lg hover:bg-red-700 transition font-medium"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
