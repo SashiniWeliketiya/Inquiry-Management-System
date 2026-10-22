@@ -15,5 +15,5 @@ A full-stack Inquiry Management System built for efficient handling of customer 
 
 ### 2. Database Configuration
 1. Open your PostgreSQL terminal (psql) or pgAdmin and create the database:
-   ``sql
-    create database coffee_ninja_db;
+   ```sql
+   CREATE DATABASE coffee_ninja_db;
