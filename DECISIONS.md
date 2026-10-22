@@ -1,29 +1,26 @@
-
-
-```markdown
 # Engineering Decisions & Trade-offs
 
 ## 1. Assumptions Made
-- **User Roles:** Two primary user types: `Customer` (submits and tracks inquiries) and `Staff/Admin` (reviews, updates inquiry status, and manages records).
-- **Session Management:** Stateless JSON Web Tokens (JWT) are used for authentication, storing token state on the client side.
-- **Relational Integrity:** PostgreSQL was selected to utilize native database constraints (`SERIAL`, Foreign Keys, and custom `ENUM` types for inquiry statuses).
+- **User Roles:** Kept it simple with two main user types: `Customer` (who creates and tracks inquiries) and `Staff/Admin` (who manages and updates inquiry statuses).
+- **Authentication:** Used standard JSON Web Tokens (JWT) for handling user logins and keeping sessions simple on the client side.
+- **Database Choice:** Chose PostgreSQL because relational databases make it very easy to manage foreign keys and tables between users and inquiries.
 
 ---
 
 ## 2. Meaningful Design Choices
-- **Database-Level Enums for Statuses:** Implemented PostgreSQL ENUM types (`'New'`, `'In Progress'`, `'Resolved'`) to strictly enforce valid inquiry states at the database level and prevent data corruption.
-- **Layered Backend Architecture:** Separated controllers, middleware (auth/validation), and database models to maintain clean separation of concerns and code reusability.
-- **Input Validation & Sanitization:** Validated incoming requests before database queries to protect against invalid data entries and injection vulnerabilities.
+- **Database-Level Status Enums:** Used PostgreSQL ENUM types (`'New'`, `'In Progress'`, `'Resolved'`) so that incorrect status names can never be saved into the database by mistake.
+- **Clean Folder Structure:** Separated routes, controllers, and models properly in the backend so the code stays neat, easy to read, and organized.
+- **Input Validation:** Checked all user inputs before sending them to the database to prevent bad data or basic security issues.
 
 ---
 
 ## 3. Key Trade-off Accepted
-- **Stateless JWT vs. Token Blacklisting:** Chose standard stateless JWT authentication without server-side revocation tables to reduce implementation complexity. 
-  - *Impact:* Active tokens cannot be forcefully revoked before expiration upon logout, which is acceptable for the scope of this evaluation.
+- **Stateless JWT vs. Token Blacklisting:** Decided to use simple JWT tokens without setting up a server-side logout blacklist database table to save development time. 
+  - *Impact:* Once logged in, a token stays valid until it expires naturally, which is totally fine for an assessment project like this.
 
 ---
 
 ## 4. What I Would Improve Next
-1. **Real-Time Notifications:** Integrate WebSockets (Socket.io) to instantly alert staff members when a new inquiry is submitted.
-2. **Automated CI/CD Pipeline:** Configure GitHub Actions for automated unit test execution on pull requests.
-3. **Advanced Role-Based Access Control (RBAC):** Introduce granular permissions separating junior staff and senior administrators.
+1. **Real-Time Alerts:** Add WebSockets so staff members get instant pop-up notifications when a new inquiry comes in without refreshing the page.
+2. **Automated Testing:** Set up GitHub Actions to run tests automatically whenever code is pushed.
+3. **Better Role Permissions:** Add more granular roles so junior staff and main administrators have different access levels.
